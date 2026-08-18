@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bharosank — credit worksheet</title>
+<meta name="description" content="Bharosank turns the shopkeeper's own credit policy into a consistent, printable per-customer credit-limit worksheet — every weight visible. A fairness tool, not a risk score.">
+<style>
+  :root{--bg:#eef6f2;--card:#fff;--ink:#0f2219;--muted:#4e6960;--brand:#2e7e5e;--brand-ink:#1c5041;--line:#d5e6df;--accent:#e2f0ea}
+  @media (prefers-color-scheme:dark){:root{--bg:#0c1512;--card:#141d18;--ink:#e3efe9;--muted:#8fab a0;--brand:#4fa683;--brand-ink:#bce3d1;--line:#213029;--accent:#132019}}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  header{padding:64px 0 24px;text-align:center}
+  .eyebrow{color:var(--brand);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+  h1{font-size:44px;margin:.2em 0 .1em;letter-spacing:-.02em}
+  .tag{color:var(--muted);font-size:19px;max-width:640px;margin:8px auto 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:34px}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .card h2{margin:0 0 8px;font-size:20px}
+  label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+  input{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:15px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .out{margin-top:16px;background:var(--accent);border-radius:12px;padding:16px}
+  .big{font-size:30px;font-weight:800;color:var(--brand-ink)}
+  .rowline{display:flex;justify-content:space-between;padding:4px 0;font-size:14px;border-top:1px dashed var(--line);margin-top:6px}
+  footer{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Bharosank · भरोसांक</div>
+    <h1>How much udhaar is fair?</h1>
+    <p class="tag">Extending more credit to a familiar face is a daily gut call. Bharosank turns your
+      own rule into a consistent, printable limit — so you can say why A got more than B.</p>
+  </header>
+  <div class="grid">
+    <div class="card">
+      <h2>Try it</h2>
+      <label>Customer avg monthly purchase ₹</label><input id="avg" type="number" value="8000">
+      <label>Limit = this % of monthly</label><input id="pct" type="number" value="50">
+      <div class="two"><div><label>Recent late payments</label><input id="late" type="number" value="2"></div>
+        <div><label>₹ penalty per late</label><input id="pen" type="number" value="500"></div></div>
+      <div class="out">
+        <div>Recommended credit limit</div><div class="big" id="lim">₹0.00</div>
+        <div class="rowline"><span>Base (% of monthly)</span><b id="base">–</b></div>
+        <div class="rowline"><span>Late-payment penalty</span><b id="pn">–</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Fairness, not a black box</h2>
+      <p style="color:var(--muted)">Khata apps record balances but never recommend a limit. Bharosank
+        does — but it strips all "risk score / prediction" framing. It's a transparent worksheet built
+        from your own weights, so the number is defensible and consistent.</p>
+      <p style="color:var(--muted)">Limit = (% × monthly) − (late × penalty), floored at zero.</p>
+      <p style="color:var(--muted);font-size:14px">Flutter → Go → PostgreSQL.</p>
+    </div>
+  </div>
+  <footer>Bharosank · a local-first shopkeeper tool · offline, no account.</footer>
+</div>
+<script>
+  const $=id=>document.getElementById(id), inr=v=>'₹'+(isFinite(v)?v:0).toFixed(2);
+  function calc(){
+    const avg=+$('avg').value||0, pct=+$('pct').value||0, late=+$('late').value||0, pen=+$('pen').value||0;
+    const base=avg*pct/100, penalty=late*pen; let lim=base-penalty; if(lim<0) lim=0;
+    $('lim').textContent=inr(lim); $('base').textContent=inr(base); $('pn').textContent='− '+inr(penalty);
+  }
+  document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calc)); calc();
+</script>
+</body>
+</html>
